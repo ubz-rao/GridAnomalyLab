@@ -1,0 +1,17 @@
+{
+    "total_records": 4320,
+    "anomalies": 155,
+    "anomaly_rate": 0.03587962962962963,
+    "severity_counts": {
+        "Normal": 4165,
+        "Low": 151,
+        "Medium": 4,
+        "High": 0
+    },
+    "score_distribution": {
+        "0": 4165,
+        "1": 151,
+        "2-3": 4,
+        "4-5": 0
+    }
+}
