@@ -1,49 +1,57 @@
 # GridAnomalyLab  
-Smart Meter Anomaly Detection in AMI Systems
+## Smart Meter Analytics & Anomaly Detection Engine for AMI Systems
 
 ---
 
 ## Overview
 
-GridAnomalyLab is a modular analytics project for detecting anomalies in Smart Meter data used in Advanced Metering Infrastructure (AMI).
+GridAnomalyLab is a modular analytics and monitoring system designed for Smart Meter data in Advanced Metering Infrastructure (AMI) environments.
 
-It simulates and analyzes electrical consumption patterns to identify abnormal grid behavior such as:
+It provides an end-to-end pipeline for:
 
-- Energy theft or non-technical losses  
-- Meter malfunction or data corruption  
-- Abnormal load spikes  
-- Poor power factor conditions  
-- Reactive power imbalance  
+- Electrical feature engineering from raw meter data  
+- Rule-based and statistical anomaly detection  
+- Grid behavior analysis (active & reactive power dynamics)  
+- Operational KPI scoring for system health evaluation  
+- Interactive Streamlit dashboard for real-time visualization  
 
-The project is designed using real-world electrical engineering principles combined with statistical anomaly detection techniques.
+The system is built using real-world electrical engineering principles combined with data-driven analytics techniques.
 
 ---
 
 ## Industry Context
 
-Modern utility companies deploy AMI systems to collect high-resolution energy usage data from smart meters.
+Modern AMI systems generate high-frequency smart meter data that enables utilities to move beyond billing into operational intelligence:
 
-This data is used for:
-
-- Grid monitoring and optimization  
-- Loss detection and reduction  
-- Demand forecasting  
+- Grid observability and real-time monitoring  
+- Technical & non-technical loss detection  
 - Power quality assessment  
-- Operational intelligence for utilities  
+- Load behavior analytics  
+- Data-driven operational decision support  
 
-GridAnomalyLab replicates a simplified version of such utility analytics pipelines.
+GridAnomalyLab simulates a utility-grade analytics pipeline used in modern distribution network monitoring systems.
 
 ---
 
 ## Approach
 
-The system uses a rule-based anomaly detection engine grounded in electrical concepts:
+The anomaly detection engine is based on electrical system behavior and statistical thresholds:
 
-- Power Factor deviation indicates inefficiency  
-- Z-score identifies abnormal load spikes  
-- Reactive vs Active power imbalance detects instability  
+- Power Factor deviation indicates inefficiency in load utilization  
+- Z-score based detection identifies abnormal load spikes  
+- Reactive vs Active power imbalance highlights grid instability  
 
-Each reading is scored to classify system behavior as normal or anomalous.
+Each data point is scored and classified as normal or anomalous.
+
+### Streamlit Dashboard Integration
+
+A dedicated **Streamlit dashboard (app/dashboard.py)** has been introduced as the primary visualization layer. It provides:
+
+- Real-time KPI monitoring  
+- Time-window based analysis  
+- Interactive power flow visualizations  
+- Anomaly event exploration  
+- Grid state-space visualization (P-Q plane)  
 
 ---
 
@@ -56,17 +64,20 @@ GridAnomalyLab/
 │   └── ami_data.csv
 │
 ├── outputs/
-│   └── (outputs)
+│   └── (generated reports & artifacts)
 │
 ├── src/
-│   ├── config.py
-│   ├── data_loader.py
-│   ├── features.py
-│   ├── anomaly.py
-│   ├── visualization.py
-│   └── pipeline.py
+│   ├── config.py              # System configuration & thresholds
+│   ├── data_loader.py         # Data ingestion layer
+│   ├── features.py            # Electrical feature engineering
+│   ├── anomaly.py             # Anomaly detection engine
+│   ├── visualization.py       # Plot utilities (optional)
+│   └── pipeline.py            # Processing pipeline
 │
-├── main.py
+├── app/
+│   └── dashboard.py           # Streamlit analytics dashboard
+│
+├── main.py                    # Batch pipeline execution
 ├── requirements.txt
 ├── README.md
 └── .gitignore
@@ -78,119 +89,166 @@ GridAnomalyLab/
 ## Pipeline Workflow
 
 ### 1. Data Loading
-Loads AMI smart meter data from CSV or generates synthetic data.
+The system loads AMI smart meter data from a CSV file or generates synthetic data for testing and development purposes.
+
+This step ensures:
+- Consistent schema handling  
+- Time-series readiness  
+- Missing value control (if applicable)  
+
+---
 
 ### 2. Feature Engineering
-Computes electrical features:
+Raw electrical signals are transformed into meaningful engineering features inside `src/features.py`.
 
-- Net Active Power (kw_net)  
-- Net Reactive Power (kvar_net)  
-- Apparent Power (kva)  
-- Power Factor (pf)  
+Computed features include:
+
+- Net Active Power (`kw_net = kw+ - kw-`)  
+- Net Reactive Power (`kvar_net = kvar+ - kvar-`)  
+- Apparent Power (`kva = √(kw_net² + kvar_net²)`)  
+- Power Factor (`pf`)  
+
+These features represent the **operational state of the electrical grid**.
+
+---
 
 ### 3. Anomaly Detection
-Detects abnormal behavior using:
+The anomaly engine (`src/anomaly.py`) identifies abnormal behavior using rule-based and statistical methods:
 
-- Power Factor thresholding  
-- Rolling Z-score for load spikes  
-- Reactive power imbalance rule  
+- Power Factor threshold violations  
+- Z-score based load deviation detection  
+- Reactive vs Active power imbalance  
 
-### 4. Visualization
-Generates insights using plots:
+Each record is assigned:
+- Anomaly flag (`anomaly`)  
+- Anomaly score (`anomaly_score`)  
+- Severity level (`severity`)  
 
-- Power trend over time  
-- Power quadrant distribution  
-- Power factor stability  
+---
+
+### 4. KPI & System Health Scoring
+A system-level health metric is computed using anomaly density over a time window:
+
+- Total records  
+- Total anomalies  
+- Anomaly rate  
+- System health score  
+
+This is used to classify grid condition as:
+- **Healthy**  
+- **Degraded**  
+- **Critical**
+
+---
+
+### 5. Streamlit Dashboard (Visualization Layer)
+The processed data is visualized using an interactive Streamlit dashboard (`app/dashboard.py`).
+
+It provides:
+
+- Time-window based filtering  
+- KPI scorecards for system monitoring  
+- Active and reactive power time-series plots  
+- Power factor stability trends  
 - Load stress analysis  
+- Grid state-space visualization (P-Q plane)  
+- Anomaly event logs with export option  
 
-### 5. Reporting
-Exports:
-
-- Processed dataset  
-- Anomaly summary report  
-- Visualization images  
+This layer transforms raw analytics into **operational intelligence for grid monitoring**.
 
 ---
 
 ## Features
 
-Input meter parameters:
+### Input Meter Parameters
 
-- kw+ (Active Import)  
-- kw- (Active Export)  
-- kvar+ (Reactive Import)  
-- kvar- (Reactive Export)  
+The system processes standard smart meter electrical signals:
 
-Derived features:
+- `kw+` → Active Power Import  
+- `kw-` → Active Power Export  
+- `kvar+` → Reactive Power Import  
+- `kvar-` → Reactive Power Export  
 
-- kw_net  
-- kvar_net  
-- kva  
-- pf  
+---
+
+### Derived Features
+
+These engineered features represent the electrical state of the grid:
+
+- `kw_net` → Net Active Power (Import − Export)  
+- `kvar_net` → Net Reactive Power (Import − Export)  
+- `kva` → Apparent Power (Combined electrical load magnitude)  
+- `pf` → Power Factor (System efficiency indicator)  
 
 ---
 
 ## Installation
 
-Install dependencies:
+Install all dependencies using:
 
+```bash
 pip install -r requirements.txt
 
+```
 ---
 
 ## Requirements
 
+```text
 pandas>=1.5
 numpy>=1.23
-matplotlib>=3.7
+plotly>=5.0
+streamlit>=1.28
+
+```
 
 ---
 
 ## How to Run
 
 Run the full pipeline:
-
 python main.py
 
+Run Streamlit dashboard:
+streamlit run app/dashboard.py
 
 ---
 
 ## Outputs
 
 Generated files inside the outputs folder:
-
-- processed.csv → Final dataset with features and anomaly labels  
-- report.json → Summary statistics of anomalies  
-- power_trend.png → Time series power visualization  
-- quadrant.png → Power quadrant analysis  
-- power_factor.png → Power factor behavior  
-- load_stress.png → Grid stress visualization  
+- processed.csv → Final dataset with engineered features and anomaly labels
+- report.json → Summary statistics of detected anomalies
+- power_trend.png → Time series visualization of active/reactive power
+- quadrant.png → Power quadrant (P-Q plane) analysis
+- power_factor.png → Power factor stability analysis
+- load_stress.png → Grid stress visualization using percentile-based scaling
 
 ---
 
 ## Visualization Insights
 
 ### Power Trend
-Shows how import and export power varies over time.
+Shows how active and reactive power vary over time, highlighting consumption behavior and export patterns.
 
 ### Power Quadrant
-Displays distribution of active vs reactive power with anomaly overlay.
+Visualizes system operating regions in the P-Q plane, enabling detection of reactive dominance and instability zones.
 
 ### Power Factor
-Indicates system efficiency and electrical quality.
+Indicates electrical efficiency and quality of load, with low values highlighting inefficiencies.
 
 ### Load Stress
-Highlights high load periods using percentile-based thresholds.
+Identifies high stress periods in the grid using normalized apparent power distribution.
 
 ---
 
 ## Future Enhancements
 
-- Real-time streaming using MQTT or Kafka  
-- Dashboard using Streamlit or Power BI  
-- API deployment with FastAPI  
-- Integration with weather and tariff data  
-- Machine learning based anomaly detection  
+- Real-time streaming integration using MQTT or Kafka
+- Production-grade dashboard using Streamlit or Power BI
+- REST API deployment using FastAPI
+- Integration with weather, tariff, and demand forecasting models
+- Machine learning-based anomaly detection for predictive analytics
 
 ---
 
