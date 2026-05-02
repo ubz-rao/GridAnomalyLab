@@ -150,7 +150,6 @@ It provides:
 - KPI scorecards for system monitoring  
 - Active and reactive power time-series plots  
 - Power factor stability trends  
-- Load stress analysis  
 - Grid state-space visualization (P-Q plane)  
 - Anomaly event logs with export option  
 
